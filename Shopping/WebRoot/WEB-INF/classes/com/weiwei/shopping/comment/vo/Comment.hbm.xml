@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+    <hibernate-mapping>
+    	<!-- table指数据库中对应的表名 -->
+    	<class table="comment" name="com.weiwei.shopping.comment.vo.Comment">
+    		<id name="cid">
+    			<generator class="native"></generator>
+    		</id>
+    		<property name="cdate"></property>
+    		<property name="type"></property>
+    		<property name="comment"></property>
+    		<!-- 商品对象 -->
+    		<many-to-one name="product" lazy="false" class="com.weiwei.shopping.product.vo.Product" column="pid"></many-to-one>
+    		<!-- 用户对象 -->
+    		<many-to-one name="user" lazy="false" class="com.weiwei.shopping.user.vo.User" column="uid"></many-to-one>
+    	</class>
+    </hibernate-mapping>

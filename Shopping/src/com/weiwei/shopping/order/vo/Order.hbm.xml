@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+    <hibernate-mapping>
+    	<!-- table指数据库中对应的表名 -->
+    	<class name="com.weiwei.shopping.order.vo.Order" table="orders">
+    		<id name="oid">
+    			<generator class="native"></generator>
+    		</id>
+    		<property name="address"></property>
+    		<property name="name"></property>
+    		<property name="ordertime"></property>
+    		<property name="phone"></property>
+    		<property name="state"></property>
+    		<property name="total"></property>
+    		<!-- 
+	    		相对于用户类，订单类是many的一端 :在订单类中配置many-to-one
+	    		name:many端的实体类中的对象属性
+	    		column:many端表中的外键字段
+	    		class:one端的类的全路径
+    		 -->
+    		<many-to-one name="user" lazy="false" class="com.weiwei.shopping.user.vo.User" column="uid"></many-to-one>
+    		
+    		<!-- 配置一个订单项集合 懒加载默认是true，为了不延迟改为false-->
+    		<set name="orderItems" lazy="false" order-by="itemid" cascade="all">
+    			<key column="oid"></key>
+    			<one-to-many class="com.weiwei.shopping.order.vo.OrderItem"/>
+    		</set>
+    	</class>
+    </hibernate-mapping>

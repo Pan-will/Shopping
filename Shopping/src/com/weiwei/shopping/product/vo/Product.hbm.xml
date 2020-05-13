@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+<hibernate-mapping>
+	<class name="com.weiwei.shopping.product.vo.Product" table="product">
+		<id name="pid">
+			<generator class="native"></generator>
+		</id>
+		<property name="pname"></property>
+		<property name="market_price"></property>
+		<property name="shop_price"></property>
+		<property name="image"></property>
+		<property name="pdesc"></property>
+		<property name="is_hot"></property>
+		<property name="pdate"></property>
+		
+		<!-- 
+			相对于二级分类，商品类是many的一端 :在商品类中配置many-to-one
+    		name:many端的实体类中的对象属性
+    		column:表中的外键字段
+    		class:one端的实体类的全路径
+		 -->
+		 <many-to-one name="categorySecond" lazy="false" class="com.weiwei.shopping.categorysecond.vo.CategorySecond" column="csid"></many-to-one>
+		 <!-- 配置一个评价类集合 懒加载默认是true，为了不延迟改为false-->
+		 <set name="comments" lazy="false" order-by="cdate" cascade="all">
+		 	<key column="pid"></key>
+		 	<one-to-many class="com.weiwei.shopping.comment.vo.Comment"/>
+		 </set>
+	</class>
+</hibernate-mapping>

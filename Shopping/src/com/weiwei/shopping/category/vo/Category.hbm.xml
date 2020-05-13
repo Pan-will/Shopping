@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+    <hibernate-mapping>
+    	<class name="com.weiwei.shopping.category.vo.Category" table="category">
+    		<id name="cid">
+    			<generator class="native"></generator><!-- native跨数据库使用 -->
+    		</id>
+    		<property name="cname"></property>
+    		<!-- 配置一个二级分类的集合   按照编号进行排序  懒加载默认是true，为了不延迟改为false  级联删除配置cascade-->
+    		<set order-by="csid" cascade="delete" name="categorySeconds" lazy="false">
+    			<key column="cid"></key>
+    			<one-to-many class="com.weiwei.shopping.categorysecond.vo.CategorySecond"/>
+    		</set>
+    	</class>
+    </hibernate-mapping>

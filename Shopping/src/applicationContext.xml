@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+	
+	<!-- Step1:配置连接池 -->
+	<!-- 引入外部属性文件 -->
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+	<!-- 配置C3P0连接池: -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.driver}"/>
+		<property name="jdbcUrl" value="${jdbc.url}"/>
+		<property name="user" value="${jdbc.user}"/>
+		<property name="password" value="${jdbc.password}"/>
+	</bean>
+	
+	<!-- Step2:Hibernate的相关信息 -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<!-- 注入连接池 -->
+		<property name="dataSource" ref="dataSource"/>
+		<!-- 配置Hibernate的其他的属性 -->
+		<property name="hibernateProperties">
+			<props>
+				<!-- 配置方言 -->
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<!-- 显示sql语句 -->
+				<prop key="hibernate.show_sql">false</prop>
+				<!-- sql语句格式整理 -->
+				<prop key="hibernate.format_sql">true</prop>
+				<!-- 自动提交链接 -->
+				<prop key="hibernate.connection.autocommit">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+		<!-- 配置Hibernate的映射文件 -->
+		<property name="mappingResources">
+			<list>
+				<value>com/weiwei/shopping/user/vo/User.hbm.xml</value>
+				<value>com/weiwei/shopping/category/vo/Category.hbm.xml</value>
+				<value>com/weiwei/shopping/categorysecond/vo/CategorySecond.hbm.xml</value>
+				<value>com/weiwei/shopping/product/vo/Product.hbm.xml</value>
+				<value>com/weiwei/shopping/order/vo/Order.hbm.xml</value>
+				<value>com/weiwei/shopping/order/vo/OrderItem.hbm.xml</value>
+				<value>com/weiwei/shopping/adminuser/vo/Adminuser.hbm.xml</value>
+				<value>com/weiwei/shopping/comment/vo/Comment.hbm.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Step3:配置事务管理 -->
+	<!-- 事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- 开启注解事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+<!-- ********************************前台action******************************************* -->
+	<!-- Action的配置 ========注意：配置的Action上千万不要忘记scope===================-->
+	
+	<!-- 首页访问的Action -->
+	<bean id="indexAction" class="com.weiwei.shopping.index.action.IndexAction" scope="prototype">
+		<!-- 访问首页时就进行一级分类查询 -->
+		<property name="categoryService" ref="categoryService" />
+		<!-- 访问首页时就进行商品查询 -->
+		<property name="productService" ref="productService" />
+	</bean>
+	
+	<!-- 配置验证码Action -->
+	<bean id="checkImgAction" class="com.weiwei.shopping.user.action.CheckImgAction" scope="prototype"></bean>
+	
+	<!-- 用户模块的Action -->
+	<bean id="userAction" class="com.weiwei.shopping.user.action.UserAction" scope="prototype">
+		<!-- 注入userService -->
+		<property name="userService" ref="userService" />
+	</bean>
+	
+	<!-- 商品模块的Action -->
+	<bean id="productAction" class="com.weiwei.shopping.product.action.ProductAction" scope="prototype">
+		<!-- 注入productService -->
+		<property name="productService" ref="productService"></property>
+		<!-- 注入commentService -->
+		<property name="commentService" ref="commentService"></property>
+	</bean>
+	
+	<!-- 购物车的Action -->
+	<bean id="cartAction" class="com.weiwei.shopping.cart.action.CartAction" scope="prototype">
+		<!-- 注入productService -->
+		<property name="productService" ref="productService"></property>
+	</bean>
+	
+	<!-- 配置OrderAction -->
+	<bean id="orderAction" class="com.weiwei.shopping.order.action.OrderAction" scope="prototype">
+		<!-- 注入orderService -->
+		<property name="orderService" ref="orderService"></property>
+	</bean>
+	<bean id="payorderAction" class="com.weiwei.shopping.order.action.PayorderAction" scope="prototype">
+		<!-- 注入orderService -->
+		<property name="orderService" ref="orderService"></property>
+	</bean>
+	
+	<!-- 配置CommentAction -->
+	<bean id="commentAction" class="com.weiwei.shopping.comment.action.CommentAction" scope="prototype">
+		<!-- 注入commentService -->
+		<property name="commentService" ref="commentService"></property>
+	</bean>
+	
+<!-- ********************************后台action******************************************* -->
+	<!-- 配置后台登录模块的Action -->
+	<bean id="adminIndexAction" class="com.weiwei.shopping.adminuser.action.AdminIndexAction" scope="prototype">
+		<!-- 注入service -->
+		<property name="adminIndexService" ref="adminIndexService"></property>
+	</bean>
+	
+	<!-- 配置后台一级分类管理的Action -->
+	<bean id="adminCategoryAction" class="com.weiwei.shopping.category.adminaction.AdminCategoryAction"  scope="prototype">
+		<!-- 注入CategoryService -->
+		<property name="categoryService" ref="categoryService"></property>
+	</bean>
+	
+	<!-- 配置后台二级分类管理的Action -->
+	<bean id="adminCategorySecondAction" class="com.weiwei.shopping.categorysecond.adminaction.AdminCategorySecondAction"  scope="prototype">
+		<!-- 注入CategorySecondService -->
+		<property name="categorySecondService" ref="categorySecondService"></property>
+		<!-- 注入CategoryService -->
+		<property name="categoryService" ref="categoryService"></property>
+	</bean>
+	
+	<!-- 配置后台商品管理的Action -->
+	<bean id="adminProductAction" class="com.weiwei.shopping.product.adminaction.AdminProductAction" scope="prototype">
+		<!-- 注入productService -->
+		<property name="productService" ref="productService"></property>
+		<!-- 注入CategorySecondService -->
+		<property name="categorySecondService" ref="categorySecondService"></property>
+	</bean>
+	
+	<!-- 配置后台订单管理的Action -->
+	<bean id="adminOrderAction" class="com.weiwei.shopping.order.adminaction.AdminOrderAction" scope="prototype">
+		<!-- 注入orderService -->
+		<property name="orderService" ref="orderService"></property>
+	</bean>
+	
+	<!-- 配置后台用户管理的Action -->
+	<bean id="adminUserAction" class="com.weiwei.shopping.user.adminaction.AdminUserAction" scope="prototype">
+		<!-- 注入userService -->
+		<property name="userService" ref="userService"></property>
+	</bean>
+	
+	
+	<!-- Service的配置  ==========现在service类中注入，再写配置文件=================-->
+	<bean id="userService" class="com.weiwei.shopping.user.service.UserService">
+		<property name="userDao" ref="userDao" />
+	</bean>
+	<!-- 一级分类的Service -->
+	<bean id="categoryService" class="com.weiwei.shopping.category.service.CategoryService">
+		<property name="categoryDao" ref="categoryDao"></property>
+	</bean>
+	<!-- 二级分类的Service -->
+	<bean id="categorySecondService" class="com.weiwei.shopping.categorysecond.service.CategorySecondService">
+		<!-- 注入CategorySecondDao -->
+		<property name="categorySecondDao" ref="categorySecondDao"></property>
+	</bean>
+	<!-- 商品的Service -->
+	<bean id="productService" class="com.weiwei.shopping.product.service.ProductService">
+		<property name="productDao" ref="productDao"></property>
+	</bean>
+	<!-- 订单的Service -->
+	<bean id="orderService" class="com.weiwei.shopping.order.service.OrderService">
+		<property name="orderDao" ref="orderDao"></property>
+	</bean>
+	<!-- 商品评价的Service -->
+	<bean id="commentService" class="com.weiwei.shopping.comment.service.CommentService">
+		<property name="commentDao" ref="commentDao"></property>
+	</bean>
+	<!-- *******************后台Service***************** -->
+	<!-- 后台登录模块的Service -->
+	<bean id="adminIndexService" class="com.weiwei.shopping.adminuser.service.AdminIndexService">
+		<property name="adminIndexDao" ref="adminIndexDao"></property>
+	</bean>
+	
+	
+	<!-- ==========================Dao的配置=========================-->
+	<!-- 用户的Dao -->
+	<bean id="userDao" class="com.weiwei.shopping.user.dao.UserDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- 一级分类的Dao -->
+	<bean id="categoryDao" class="com.weiwei.shopping.category.dao.CategoryDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- 二级分类的Dao -->
+	<bean id="categorySecondDao" class="com.weiwei.shopping.categorysecond.dao.CategorySecondDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- 商品的Dao -->
+	<bean id="productDao" class="com.weiwei.shopping.product.dao.ProductDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- 订单的Dao -->
+	<bean id="orderDao" class="com.weiwei.shopping.order.dao.OrderDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- 商品评价的Dao -->
+	<bean id="commentDao" class="com.weiwei.shopping.comment.dao.CommentDao">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<!-- *******************后台Dao***************** -->
+	<!-- 后台登录模块的Dao -->
+	<bean id="adminIndexDao" class="com.weiwei.shopping.adminuser.dao.AdminIndexDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+</beans>

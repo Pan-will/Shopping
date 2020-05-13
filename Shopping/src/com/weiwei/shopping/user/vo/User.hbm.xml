@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.weiwei.shopping.user.vo.User" table="user">
+		<id name="uid">
+			<generator class="native"></generator>
+		</id>
+		<property name="username"></property>
+		<property name="password"></property>
+		<property name="name"></property>
+		<property name="email"></property>
+		<property name="phone"></property>
+		<property name="address"></property>
+		<property name="state"></property>
+		<property name="code"></property>
+		
+		<!-- 配置一个订单类的集合   按照编号进行排序  懒加载默认是true，为了不延迟改为false-->
+		<set name="orders" cascade="all">
+			<key column="uid"></key>
+			<one-to-many class="com.weiwei.shopping.order.vo.Order"/>
+		</set>
+		<!-- 配置一个评价类集合 懒加载默认是true，为了不延迟改为false-->
+		 <set name="comments" lazy="false" order-by="cdate" cascade="all">
+		 	<key column="uid"></key>
+		 	<one-to-many class="com.weiwei.shopping.comment.vo.Comment"/>
+		 </set>
+	</class>
+</hibernate-mapping>

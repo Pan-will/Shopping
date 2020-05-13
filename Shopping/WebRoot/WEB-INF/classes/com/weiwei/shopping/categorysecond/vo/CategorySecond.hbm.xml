@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+    <hibernate-mapping>
+    	<class name="com.weiwei.shopping.categorysecond.vo.CategorySecond" table="categorysecond">
+    		<id name="csid">
+    			<generator class="native"></generator>
+    		</id>
+    		<property name="csname"></property>
+    		<!-- 
+	    		相对于一级分类，二级分类是many的一端 :在二级分类中配置many-to-one
+	    		name:many端的实体类中的对象属性
+	    		column:many端表中的外键字段
+	    		class:one端的类的全路径
+    		 -->
+    		 <many-to-one name="category" lazy="false" class="com.weiwei.shopping.category.vo.Category" column="cid"></many-to-one>
+    		 
+    		 <!-- 配置一个二级分类的集合   按照编号进行排序  懒加载默认是true，为了不延迟改为false-->
+    		 <set name="products" lazy="false">
+    		 	<key column="csid"></key>
+    		 	<one-to-many class="com.weiwei.shopping.product.vo.Product"/>
+    		 </set>
+    	</class>
+    </hibernate-mapping>
